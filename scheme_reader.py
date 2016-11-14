@@ -108,6 +108,7 @@ def scheme_read(src):
     if src.current() is None:
         raise EOFError
     val = src.remove_front()  # Get the first token
+
     if val == 'nil':
         # BEGIN PROBLEM 1
         return nil
@@ -118,7 +119,7 @@ def scheme_read(src):
         # END PROBLEM 1
     elif val == "'":
         # BEGIN PROBLEM 7B
-        return str(src)
+        return Pair('quote', Pair(scheme_read(src), nil))
         # END PROBLEM 7B
     elif val not in DELIMITERS:
         return val
@@ -156,7 +157,7 @@ def read_tail(src):
             # END PROBLEM 2
         else:
             # BEGIN PROBLEM 1
-            return Pair(scheme_read(src),read_tail(src))
+            return Pair(scheme_read(src), read_tail(src))
             # END PROBLEM 1
     except EOFError:
         raise SyntaxError('unexpected end of file')
