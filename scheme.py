@@ -107,7 +107,15 @@ class Frame:
         """
         child = Frame(self) # Create a new child with self as the parent
         # BEGIN PROBLEM 11
-        "*** REPLACE THIS LINE ***"
+        if len(formals) != len(vals):
+            raise SchemeError("incorrect number of values in make_child_frame.")
+        
+        curr_formal, curr_val = formals, vals
+
+        while curr_formal is not nil:
+            child.bindings[curr_formal.first] = curr_val.first
+            curr_formal = curr_formal.second
+            curr_val = curr_val.second
         # END PROBLEM 11
         return child
 
