@@ -107,7 +107,7 @@ def scheme_read(src):
     """
     if src.current() is None:
         raise EOFError
-    val = src.remove_front() # Get the first token
+    val = src.remove_front()  # Get the first token
     if val == 'nil':
         # BEGIN PROBLEM 1
         return nil
