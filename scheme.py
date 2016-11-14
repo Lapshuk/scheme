@@ -79,9 +79,9 @@ class Frame:
         """Return the value bound to SYMBOL. Errors if SYMBOL is not found."""
         # BEGIN PROBLEM 3
         if symbol in self.bindings:
-            return bindings[symbol]
-        elif symbol in self.parent.bindings:
-            return self.parent.bindings[symbol]
+            return self.bindings[symbol]
+        elif self.parent is not None:
+            return self.parent.lookup(symbol)
         # END PROBLEM 3
         raise SchemeError('unknown identifier: {0}'.format(symbol))
 
