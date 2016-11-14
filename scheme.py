@@ -114,7 +114,7 @@ class PrimitiveProcedure(Procedure):
 
     def __init__(self, fn, use_env=False, name='primitive'):
         self.name = name
-        self.fn = fn
+        self.fn = fn # is the python function hat implements the primitive scheme procedure
         self.use_env = use_env
 
     def __str__(self):
@@ -135,8 +135,16 @@ class PrimitiveProcedure(Procedure):
             python_args.append(args.first)
             args = args.second
         # BEGIN PROBLEM 4
-        "*** REPLACE THIS LINE ***"
-        # END PROBLEM 4
+        if self.use_env:
+            python_args.append(env)
+
+        try:
+            return self.fn(*python_args)
+        except TypeError as e:
+            raise SchemeError(e)
+
+
+            # END PROBLEM 4
 
 class UserDefinedProcedure(Procedure):
     """A procedure defined by an expression."""
