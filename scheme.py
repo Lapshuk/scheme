@@ -293,9 +293,14 @@ def do_cond_form(expressions, env):
             test = scheme_eval(clause.first, env)
         if scheme_truep(test):
             # BEGIN PROBLEM 14
-            "*** REPLACE THIS LINE ***"
+            if clause.second is not nil:
+                return do_begin_form(clause.second, env)
+            else:
+                return test
             # END PROBLEM 14
         expressions = expressions.second
+
+
 
 def do_let_form(expressions, env):
     """Evaluate a let form."""
