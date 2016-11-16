@@ -5,29 +5,42 @@
 
 ; Some utility functions that you may find useful to implement.
 (define (map proc items)
-  'replace-this-line)
+    (if (null? items) nil
+        (cons (proc (car items)) (map proc (cdr items)))
+    )
+)
 
 (define (cons-all first rests)
-  'replace-this-line)
+    (map (lambda (x) (append (list first) x)) rests)
+)
+  
 
 (define (zip pairs)
-  'replace-this-line)
+    (list (map car pairs) (map cadr pairs))
+)
 
 ;; Problem 17
 ;; Returns a list of two-element lists
 (define (enumerate s)
   ; BEGIN PROBLEM 17
-  'replace-this-line
-  )
+    (define (numbers g k)
+        (if (null? k) nil
+            (cons (list g (car k)) (numbers (+ 1 g) (cdr k)))
+        )
+    )
+    (numbers 0 s)
+)
   ; END PROBLEM 17
 
 ;; Problem 18
 ;; List all ways to make change for TOTAL with DENOMS
 (define (list-change total denoms)
   ; BEGIN PROBLEM 18
-  'replace-this-line
-  )
+  
   ; END PROBLEM 18
+
+
+
 
 ;; Problem 19
 ;; Returns a function that checks if an expression is the special form FORM
