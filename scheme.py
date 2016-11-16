@@ -268,13 +268,6 @@ def do_if_form(expressions, env):
     elif len(expressions) == 3:
         return scheme_eval(expressions.second.second.first, env)
 
-def if_scheme_true(val):
-    """Evaluates if the val has a True value in Scheme"""
-    if (val is not 0 and val is not '') and val is False:
-        return False
-    else:
-        return True
-
 def do_and_form(expressions, env):
     """Evaluate a short-circuited and form."""
     # BEGIN PROBLEM 13
@@ -283,7 +276,7 @@ def do_and_form(expressions, env):
     else:
         curr = scheme_eval(expressions.first, env)
 
-    if not if_scheme_true(curr):
+    if scheme_falsep(curr):
         return False
     elif not expressions.second:
         return curr
@@ -299,7 +292,7 @@ def do_or_form(expressions, env):
     else:
         curr = scheme_eval(expressions.first, env)
 
-    if if_scheme_true(curr):
+    if scheme_truep(curr):
         return curr
     elif not expressions.second:
         return False
