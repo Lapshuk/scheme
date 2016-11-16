@@ -7,8 +7,18 @@
 ;;; after the last test you wish to run.
 
 ;;; **********************************
+(define a '(1 2 3))
+(define b '(4 5 6))
+(define c (cons a (cons b nil)))
+(car (cdr c))
+; expect (4 5 6)
+
+(car (cdr (car c)))
+; expect 2
+
 (let ((a 1)(b 2))(+ a b))
 ; expect 3
+
 '(let ((a 1)(b 2))(+ a b))
 ; (let ((a 1)(b 2))(+ a b))
 

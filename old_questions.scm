@@ -84,21 +84,14 @@
            ))
         ((let? expr)
          (let ((values (cadr expr))
-               (body   (cddr expr))
-             ) 
+               (body   (cddr expr)))
            ; BEGIN PROBLEM 19
-           (cons 
-                (cons 
-                    'lambda 
-                    (cons 
-                        (car (zip values)) 
-                        (map let-to-lambda body))
-                ) 
-                (map let-to-lambda (cadr (zip values))))
+            (append (list (list form params body)) args)
            ; END PROBLEM 19
-        ))
+           ))
         (else
          ; BEGIN PROBLEM 19
+         ;(cons (car expr) (map let-to-lambda (cdr expr)))
          (map let-to-lambda expr)
          ; END PROBLEM 19
          )))

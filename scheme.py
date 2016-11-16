@@ -337,22 +337,25 @@ def make_let_frame(bindings, env):
 
     formals, args = nil, nil
 
+
     while bindings is not nil:
+        #print('*******BINDINGS******',bindings)
         check_form(bindings.first, 2, 2)
         check_formals(Pair(bindings.first.first, nil))
 
         formals = Pair(bindings.first.first, formals)
 
-        if env.parent and (scheme_eval(bindings.first.second.first, env) in env.bindings):
-            args = Pair(env.bindings[bindings.first.second.first], args)
-        else:
-            args = Pair(scheme_eval(bindings.first.second.first, env), args)
+        # if env.parent and (scheme_eval(bindings.first.second.first, env) in env.bindings):
+        #     args = Pair(env.bindings[bindings.first.second.first], args)
+        # else:
+        args = Pair(scheme_eval(bindings.first.second.first, env), args)
 
         bindings = bindings.second
 
     return env.make_child_frame(formals, args)
 
     # END PROBLEM 15
+
 
 SPECIAL_FORMS = {
     'and': do_and_form,
