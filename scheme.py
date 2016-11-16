@@ -327,8 +327,6 @@ def do_cond_form(expressions, env):
             # END PROBLEM 14
         expressions = expressions.second
 
-
-
 def do_let_form(expressions, env):
     """Evaluate a let form."""
     check_form(expressions, 2)
@@ -422,8 +420,13 @@ class MuProcedure(UserDefinedProcedure):
         self.body = body
 
     # BEGIN PROBLEM 16
-    "*** REPLACE THIS LINE ***"
+    def make_call_frame(self, args, env):
+        """Make a frame that binds the formal parameters to ARGS, a Scheme list
+        of values, for a dynamically-scoped call evaluated in environment ENV."""
+        return env.make_child_frame(self.formals, args)
     # END PROBLEM 16
+
+
 
     def __str__(self):
         return str(Pair('mu', Pair(self.formals, self.body)))
@@ -438,7 +441,7 @@ def do_mu_form(expressions, env):
     formals = expressions.first
     check_formals(formals)
     # BEGIN PROBLEM 16
-    "*** REPLACE THIS LINE ***"
+    return MuProcedure(formals,expressions.second)
     # END PROBLEM 16
 
 SPECIAL_FORMS['mu'] = do_mu_form
