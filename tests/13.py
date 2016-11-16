@@ -24,10 +24,6 @@ test = {
         },
         {
           'code': r"""
-          scm> (and 3 2 False)
-          False
-          scm> (and 3 2 1)
-          1
           scm> (and 3 False 5)
           False
           scm> (and 0 1 2 3)
