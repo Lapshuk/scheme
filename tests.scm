@@ -7,7 +7,12 @@
 ;;; after the last test you wish to run.
 
 ;;; **********************************
-;;; *** Add more of your own here! ***
+(let ((a 1)(b 2))(+ a b))
+; expect 3
+'(let ((a 1)(b 2))(+ a b))
+; (let ((a 1)(b 2))(+ a b))
+
+
 ;;; **********************************
 
 ;;; These are examples from several sections of "The Structure
