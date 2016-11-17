@@ -4,6 +4,7 @@ from scheme_primitives import *
 from scheme_reader import *
 from ucb import main, trace
 
+
 ##############
 # Eval/Apply #
 ##############
@@ -32,8 +33,7 @@ def scheme_eval(expr, env, _=None): # Optional third argument is ignored
     else:
         # BEGIN PROBLEM 5
         operator = scheme_eval(first, env)
-        temp_f = lambda x: scheme_eval(x, env)
-        operands = rest.map(temp_f)
+        operands = rest.map(lambda x: scheme_eval(x, env))
         return scheme_apply(operator, operands, env)
         # END PROBLEM 5
 
@@ -54,7 +54,7 @@ def eval_all(expressions, env):
         return None
     else:
         if expressions.second is nil:
-            return scheme_eval(expressions.first, env)
+            return scheme_eval(expressions.first, env, True)
         else:
             scheme_eval(expressions.first, env)
             return eval_all(expressions.second, env)
@@ -263,7 +263,7 @@ def do_lambda_form(expressions, env):
 def do_if_form(expressions, env):
     """Evaluate an if form."""
     check_form(expressions, 2, 3)
-    if scheme_truep(scheme_eval(expressions.first, env, True)):
+    if scheme_truep(scheme_eval(expressions.first, env)):
         return scheme_eval(expressions.second.first, env, True)
     elif len(expressions) == 3:
         return scheme_eval(expressions.second.second.first, env, True)
@@ -503,13 +503,14 @@ def complete_eval(val):
     """If VAL is an Thunk, returns the result of evaluating its expression
     part. Otherwise, simply returns VAL."""
     if isinstance(val, Thunk):
-        return scheme_eval(val.expr, val.env)
+        return scheme_eval(val.expr, val.env, True)
     else:
         return val
 
 def scheme_optimized_eval(expr, env, tail=False):
     """Evaluate Scheme expression EXPR in environment ENV. If TAIL, returns an
     Thunk object containing an expression for further evaluation."""
+
     # Evaluate atoms
     if scheme_symbolp(expr):
         return env.lookup(expr)
@@ -523,6 +524,7 @@ def scheme_optimized_eval(expr, env, tail=False):
     else:
         result = Thunk(expr, env)
 
+
     while isinstance(result, Thunk):
         expr, env = result.expr, result.env
         # All non-atomic expressions are lists (combinations)
@@ -534,18 +536,9 @@ def scheme_optimized_eval(expr, env, tail=False):
         else:
             # BEGIN Extra Credit
             operator = scheme_eval(first, env)
-            #print("****************OPERATOR:", operator)
-            args = rest.map(lambda exp: scheme_eval(exp, env))
-            #print("****************ARGS:", args)
-            result = scheme_apply(operator, args, env)
-
-            # f = open('bugs', 'w')
-            # f.write("****************OPERATOR:", operator)
-            # f.write("****************ARGS:", args)
-            # f.write("****RESULT****", result)
+            operands = rest.map(lambda x: scheme_eval(x, env))
+            result = scheme_apply(operator, operands, env)
             # END Extra Credit
-    #print("****RESULT****",result)
-    f.close()
     return result
 
 ################################################################
