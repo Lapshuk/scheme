@@ -263,7 +263,7 @@ def do_lambda_form(expressions, env):
 def do_if_form(expressions, env):
     """Evaluate an if form."""
     check_form(expressions, 2, 3)
-    if scheme_truep(scheme_eval(expressions.first, env, True)):
+    if scheme_truep(scheme_eval(expressions.first, env)):
         return scheme_eval(expressions.second.first, env, True)
     elif len(expressions) == 3:
         return scheme_eval(expressions.second.second.first, env, True)
@@ -274,7 +274,8 @@ def do_and_form(expressions, env):
     if not expressions:
         return True
     else:
-        curr = scheme_eval(expressions.first, env, True)
+        is_tail = True if not expressions.second else False
+        curr = scheme_eval(expressions.first, env, is_tail)
 
     if scheme_falsep(curr):
         return False
@@ -290,7 +291,8 @@ def do_or_form(expressions, env):
     if not expressions:
         return False
     else:
-        curr = scheme_eval(expressions.first, env, True)
+        is_tail = True if not expressions.second else False
+        curr = scheme_eval(expressions.first, env, is_tail)
 
     if scheme_truep(curr):
         return curr
@@ -503,7 +505,7 @@ def complete_eval(val):
     """If VAL is an Thunk, returns the result of evaluating its expression
     part. Otherwise, simply returns VAL."""
     if isinstance(val, Thunk):
-        return scheme_eval(val.expr, val.env)
+        return scheme_eval(val.expr, val.env, True)
     else:
         return val
 
@@ -534,18 +536,10 @@ def scheme_optimized_eval(expr, env, tail=False):
         else:
             # BEGIN Extra Credit
             operator = scheme_eval(first, env)
-            #print("****************OPERATOR:", operator)
             args = rest.map(lambda exp: scheme_eval(exp, env))
-            #print("****************ARGS:", args)
             result = scheme_apply(operator, args, env)
-
-            # f = open('bugs', 'w')
-            # f.write("****************OPERATOR:", operator)
-            # f.write("****************ARGS:", args)
-            # f.write("****RESULT****", result)
             # END Extra Credit
-    #print("****RESULT****",result)
-    f.close()
+
     return result
 
 ################################################################
