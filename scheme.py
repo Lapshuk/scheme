@@ -4,7 +4,6 @@ from scheme_primitives import *
 from scheme_reader import *
 from ucb import main, trace
 
-
 ##############
 # Eval/Apply #
 ##############
@@ -33,7 +32,7 @@ def scheme_eval(expr, env, _=None): # Optional third argument is ignored
     else:
         # BEGIN PROBLEM 5
         operator = scheme_eval(first, env)
-        operands = rest.map(lambda x: scheme_eval(x, env))
+        operands = rest.map(lambda exp: scheme_eval(exp, env))
         return scheme_apply(operator, operands, env)
         # END PROBLEM 5
 
@@ -53,11 +52,12 @@ def eval_all(expressions, env):
     if expressions is nil:
         return None
     else:
-        if expressions.second is nil:
-            return scheme_eval(expressions.first, env, True)
-        else:
-            scheme_eval(expressions.first, env)
-            return eval_all(expressions.second, env)
+        temp = expressions
+        while temp.second is not nil:
+            scheme_eval(temp.first, env)
+            temp = temp.second
+        if temp.second is nil:
+            return scheme_eval(temp.first, env, True)
     # END PROBLEM 8
 
 ################
@@ -87,10 +87,20 @@ class Frame:
     def lookup(self, symbol):
         """Return the value bound to SYMBOL. Errors if SYMBOL is not found."""
         # BEGIN PROBLEM 3
-        if symbol in self.bindings:
-            return self.bindings[symbol]
-        elif self.parent is not None:
-            return self.parent.lookup(symbol)
+        temp = self
+        while temp is not None:
+            if symbol in temp.bindings:
+                return temp.bindings[symbol]
+            temp = temp.parent
+
+        # The code below worked fine for problem 3 
+        # but for problem 20 failes the tests due to python recursion call limit
+
+        # if symbol in self.bindings:
+        #     return self.bindings[symbol]
+        # elif self.parent is not None:
+        #     return self.parent.lookup(symbol)
+
         # END PROBLEM 3
         raise SchemeError('unknown identifier: {0}'.format(symbol))
 
@@ -157,7 +167,6 @@ class PrimitiveProcedure(Procedure):
         # BEGIN PROBLEM 4
         if self.use_env:
             python_args.append(env)
-
         try:
             return self.fn(*python_args)
         except TypeError as e:
@@ -226,13 +235,13 @@ def do_define_form(expressions, env):
         check_form(expressions, 2, 2)
         # BEGIN PROBLEM 6
         env.define(target, scheme_eval(expressions.second.first, env))
-        return str(target)
+        return target
         # END PROBLEM 6
     elif isinstance(target, Pair) and scheme_symbolp(target.first):
         # BEGIN PROBLEM 10
-        lambda_exp = do_lambda_form(Pair(expressions.first.second, expressions.second), env)
+        lambda_exp = do_lambda_form(Pair(target.second, expressions.second), env)
         env.define(target.first, lambda_exp)
-        return str(target.first)
+        return target.first
         # END PROBLEM 10
     else:
         bad_target = target.first if isinstance(target, Pair) else target
@@ -274,7 +283,8 @@ def do_and_form(expressions, env):
     if not expressions:
         return True
     else:
-        curr = scheme_eval(expressions.first, env, True)
+        is_tail = True if not expressions.second else False
+        curr = scheme_eval(expressions.first, env, is_tail)
 
     if scheme_falsep(curr):
         return False
@@ -290,7 +300,8 @@ def do_or_form(expressions, env):
     if not expressions:
         return False
     else:
-        curr = scheme_eval(expressions.first, env, True)
+        is_tail = True if not expressions.second else False
+        curr = scheme_eval(expressions.first, env, is_tail)
 
     if scheme_truep(curr):
         return curr
@@ -433,8 +444,6 @@ class MuProcedure(UserDefinedProcedure):
         return env.make_child_frame(self.formals, args)
     # END PROBLEM 16
 
-
-
     def __str__(self):
         return str(Pair('mu', Pair(self.formals, self.body)))
 
@@ -503,14 +512,13 @@ def complete_eval(val):
     """If VAL is an Thunk, returns the result of evaluating its expression
     part. Otherwise, simply returns VAL."""
     if isinstance(val, Thunk):
-        return scheme_eval(val.expr, val.env, True)
+        return scheme_eval(val.expr, val.env)
     else:
         return val
 
 def scheme_optimized_eval(expr, env, tail=False):
     """Evaluate Scheme expression EXPR in environment ENV. If TAIL, returns an
     Thunk object containing an expression for further evaluation."""
-
     # Evaluate atoms
     if scheme_symbolp(expr):
         return env.lookup(expr)
@@ -524,7 +532,6 @@ def scheme_optimized_eval(expr, env, tail=False):
     else:
         result = Thunk(expr, env)
 
-
     while isinstance(result, Thunk):
         expr, env = result.expr, result.env
         # All non-atomic expressions are lists (combinations)
@@ -536,7 +543,8 @@ def scheme_optimized_eval(expr, env, tail=False):
         else:
             # BEGIN Extra Credit
             operator = scheme_eval(first, env)
-            operands = rest.map(lambda x: scheme_eval(x, env))
+            #check_procedure(operator)
+            operands = rest.map(lambda exp: scheme_eval(exp, env))
             result = scheme_apply(operator, operands, env)
             # END Extra Credit
     return result
